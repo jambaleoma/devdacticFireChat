@@ -1,0 +1,7 @@
+{
+  "name": "devdacticFireChat",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

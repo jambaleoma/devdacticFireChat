@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "devdacticFireChat",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}
