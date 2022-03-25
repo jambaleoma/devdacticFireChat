@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "devdactivefirechat": {
+      "hosting": {
+        "app": [
+          "devdactivefirechat"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "devdactivefirechat"
+  }
+}

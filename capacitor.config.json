@@ -2,5 +2,11 @@
 	"appId": "io.ionic.starter",
 	"appName": "devdacticFireChat",
 	"webDir": "www",
-	"bundledWebRuntime": false
+	"bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000
+    }
+  },
+  "cordova": {}
 }
