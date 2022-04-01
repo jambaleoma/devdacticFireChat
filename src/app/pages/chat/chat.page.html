@@ -16,7 +16,7 @@
        [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
 
        <b>{{ message.fromName }}</b>
-       <span> {{ message.msg }} </span>
+       <div> {{ message.msg }} </div>
        <div class="time ion-text-right"><br>{{ message.createdAt?.toMillis() | date:'short' }}</div>
 
       </ion-col>

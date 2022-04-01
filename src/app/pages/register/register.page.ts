@@ -5,12 +5,12 @@ import { AlertController, LoadingController } from '@ionic/angular';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+  selector: 'app-register',
+  templateUrl: './register.page.html',
+  styleUrls: ['./register.page.scss'],
 })
-export class LoginPage implements OnInit {
-  credentialForm: FormGroup;
+export class RegisterPage implements OnInit {
+  registerForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -22,41 +22,42 @@ export class LoginPage implements OnInit {
 
   // Easy access from from fields
   get email() {
-    return this.credentialForm.get('email');
+    return this.registerForm.get('email');
   }
 
   get password() {
-    return this.credentialForm.get('password');
+    return this.registerForm.get('password');
+  }
+
+  get username() {
+    return this.registerForm.get('username');
   }
 
   ngOnInit() {
-    this.credentialForm = this.fb.group({
+    this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      username: ['', [Validators.required]]
     });
   }
 
-  async signIn() {
+  async signUp() {
     const loading = await this.loadingController.create();
     await loading.present();
 
-    this.chatService.signIn(this.credentialForm.value).then(user => {
+    this.chatService.signUp(this.registerForm.value).then(user => {
       loading.dismiss();
       this.router.navigateByUrl('/chat', {replaceUrl: true});
     }, async (err) => {
       loading.dismiss();
       const alert = await this.alertController.create({
-        header: ':(',
+        header: 'Sign up failed',
         message: err.message,
         buttons: ['OK']
       });
 
       await alert.present();
     });
-  }
-
-  goToRegister() {
-    this.router.navigateByUrl('/register', {replaceUrl: true});
   }
 
 }

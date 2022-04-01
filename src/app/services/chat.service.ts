@@ -24,7 +24,7 @@ export class ChatService {
     });
   }
 
-  async signUp({email, password}) {
+  async signUp({email, password, username}) {
    const credential = await createUserWithEmailAndPassword(this.afAuth, email, password);
 
    console.log('result: ', credential);
@@ -34,7 +34,8 @@ export class ChatService {
 
    return setDoc(userDocRef, {
      uid,
-     email: credential.user.email
+     email: credential.user.email,
+     username,
   });
   }
 
@@ -85,7 +86,7 @@ export class ChatService {
   getUserForMsg(msgFormId, users: User[]): string {
     for (const usr of users) {
       if (usr.uid === msgFormId) {
-        return usr.email;
+        return usr.username;
       }
     }
     return 'Deleted';
