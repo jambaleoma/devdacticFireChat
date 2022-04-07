@@ -16,21 +16,31 @@
        [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
 
        <b>{{ message.fromName }}</b>
-       <div> {{ message.msg }} </div>
-       <div class="time ion-text-right"><br>{{ message.createdAt?.toMillis() | date:'short' }}</div>
+       <img *ngIf="message?.image" [src]="message.base64String" />
+       <div>{{ message.msg }}</div>
+       <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
 
       </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>
 
+<ion-fab horizontal="start" vertical="bottom" slot="fixed">
+  <ion-fab-button color="light">
+    <ion-icon md="caret-up" ios="chevron-up-circle-outline"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-list side="top">
+    <ion-fab-button color="light" (click)="documentAttach()">
+      <ion-icon name="camera"></ion-icon>
+    </ion-fab-button>
+  </ion-fab-list>
+</ion-fab>
+
 <ion-footer>
   <ion-toolbar color="light">
     <ion-row class="ion-align-items-center">
-      <ion-col size="10">
-        <ion-textarea autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
-
-        </ion-textarea>
+      <ion-col size="8" offset="2">
+        <ion-textarea autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg"></ion-textarea>
       </ion-col>
       <ion-col size="2">
         <ion-button expand="block" fill="clear" color="primary" [disabled]="newMsg === ''"

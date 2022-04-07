@@ -60,4 +60,8 @@ export class RegisterPage implements OnInit {
     });
   }
 
+  goToLogin() {
+    this.router.navigateByUrl('/', {replaceUrl: true});
+  }
+
 }
