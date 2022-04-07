@@ -7,4 +7,6 @@ export interface Message {
   msg: string;
   fromName: string;
   myMsg: boolean;
+  base64String: string;
+  image: boolean;
 }

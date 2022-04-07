@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { collectionData, docData, Firestore } from '@angular/fire/firestore';
+import { Photo } from '@capacitor/camera';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { addDoc, collection, doc, limit, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Observable } from 'rxjs';
@@ -53,6 +54,16 @@ export class ChatService {
       msg,
       from: this.currentUser.uid,
       createdAt: serverTimestamp()
+    });
+  }
+
+  addImageChatMessage(cameraFile: Photo) {
+    const messagesDocRef = collection(this.firestore, `messages`);
+    return addDoc(messagesDocRef, {
+      base64String: 'data:image/png;base64,' + cameraFile.base64String,
+      from: this.currentUser.uid,
+      createdAt: serverTimestamp(),
+      image: true
     });
   }
 
