@@ -37,7 +37,9 @@ export class ChatPage implements OnInit {
   sendMessage() {
     this.chatService.addChatMessage(this.newMsg).then(() => {
       this.newMsg = '';
-      this.content.scrollToBottom();
+      setTimeout(() => {
+        this.content.scrollToBottom();
+      }, 1000);
     });
   }
 
@@ -45,6 +47,37 @@ export class ChatPage implements OnInit {
     this.chatService.signOut().then(() => {
       this.router.navigateByUrl('/', { replaceUrl: true});
     });
+  }
+
+  async takePhoto() {
+    const photo = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Camera
+    });
+
+    if (photo) {
+      const imageName = uuidv4() + '.' + photo.format;
+      const loading = await this.loadingController.create();
+      await loading.present();
+
+      this.chatService.addImageChatMessage(photo).then(() => {
+        this.content.scrollToBottom();
+      });
+
+      const result = await this.imageService.uploadImage(photo, imageName);
+      loading.dismiss();
+
+      if (!result) {
+        const alert = await this.alertController.create({
+          header: 'Upload failed',
+          message: 'there was a problem uploading your avatar.',
+          buttons: ['OK']
+        });
+        await alert.present();
+      }
+    }
   }
 
   async documentAttach() {
