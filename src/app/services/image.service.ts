@@ -29,12 +29,6 @@ export class ImageService {
 
     try {
       await uploadString(storageRef, cameraFile.base64String, 'base64');
-      const imageUrl = await getDownloadURL(storageRef);
-
-      const userDocRef = doc(this.firestore, `users/${user.uid}`);
-      await setDoc(userDocRef, {
-        imageUrl
-      });
       return true;
     } catch (e) {
       return null;

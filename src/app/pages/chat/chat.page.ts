@@ -68,6 +68,9 @@ export class ChatPage implements OnInit {
 
       const result = await this.imageService.uploadImage(photo, imageName);
       loading.dismiss();
+      setTimeout(() => {
+        this.content.scrollToBottom();
+      }, 500);
 
       if (!result) {
         const alert = await this.alertController.create({
@@ -99,6 +102,9 @@ export class ChatPage implements OnInit {
 
       const result = await this.imageService.uploadImage(image, imageName);
       loading.dismiss();
+      setTimeout(() => {
+        this.content.scrollToBottom();
+      }, 500);
 
       if (!result) {
         const alert = await this.alertController.create({

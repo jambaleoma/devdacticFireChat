@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding background">
   <ion-grid>
     <ion-row *ngFor="let message of messages | async">
       <ion-col size="9" [offset]="message.myMsg ? 3 : 0" class="message"
