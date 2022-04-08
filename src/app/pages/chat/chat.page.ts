@@ -29,17 +29,14 @@ export class ChatPage implements OnInit {
 
   ngOnInit() {
     this.messages = this.chatService.getChatMessages();
-    setTimeout(() => {
-      this.content.scrollToBottom();
-    }, 1000);
+    this.checkNewMessage();
+    this.scrollToBottom(1000);
   }
 
   sendMessage() {
     this.chatService.addChatMessage(this.newMsg).then(() => {
       this.newMsg = '';
-      setTimeout(() => {
-        this.content.scrollToBottom();
-      }, 1000);
+      this.scrollToBottom(1000);
     });
   }
 
@@ -63,19 +60,17 @@ export class ChatPage implements OnInit {
       await loading.present();
 
       this.chatService.addImageChatMessage(photo).then(() => {
-        this.content.scrollToBottom();
+        this.scrollToBottom(1);
       });
 
       const result = await this.imageService.uploadImage(photo, imageName);
       loading.dismiss();
-      setTimeout(() => {
-        this.content.scrollToBottom();
-      }, 500);
+      this.scrollToBottom(500);
 
       if (!result) {
         const alert = await this.alertController.create({
           header: 'Upload failed',
-          message: 'there was a problem uploading your avatar.',
+          message: 'there was a problem uploading your photo.',
           buttons: ['OK']
         });
         await alert.present();
@@ -97,19 +92,17 @@ export class ChatPage implements OnInit {
       await loading.present();
 
       this.chatService.addImageChatMessage(image).then(() => {
-        this.content.scrollToBottom();
+        this.scrollToBottom(1);
       });
 
       const result = await this.imageService.uploadImage(image, imageName);
       loading.dismiss();
-      setTimeout(() => {
-        this.content.scrollToBottom();
-      }, 500);
+      this.scrollToBottom(500);
 
       if (!result) {
         const alert = await this.alertController.create({
           header: 'Upload failed',
-          message: 'there was a problem uploading your avatar.',
+          message: 'there was a problem uploading your image.',
           buttons: ['OK']
         });
         await alert.present();
@@ -117,12 +110,18 @@ export class ChatPage implements OnInit {
     }
   }
 
-  heart() {
-    console.log('heart');
+  checkNewMessage() {
+    this.chatService.getIsNewMessageArrived().subscribe((val) => {
+      if (val) {
+        this.scrollToBottom(1000);
+      }
+    });
   }
 
-  openCamera() {
-    console.log('camera');
+  scrollToBottom(timeout: number) {
+    setTimeout(() => {
+      this.content.scrollToBottom();
+    }, timeout);
   }
 
 }
