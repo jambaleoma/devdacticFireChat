@@ -51,7 +51,7 @@ export class ChatPage implements OnInit {
 
   async takePhoto() {
     const photo = await Camera.getPhoto({
-      quality: 90,
+      quality: 50,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Camera
@@ -82,7 +82,7 @@ export class ChatPage implements OnInit {
 
   async documentAttach() {
     const image = await Camera.getPhoto({
-      quality: 90,
+      quality: 50,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Photos
