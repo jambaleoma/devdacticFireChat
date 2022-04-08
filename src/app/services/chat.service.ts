@@ -4,7 +4,7 @@ import { collectionData, docData, Firestore } from '@angular/fire/firestore';
 import { Photo } from '@capacitor/camera';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { addDoc, collection, doc, limit, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { Message } from '../model/Message';
 import { User } from '../model/User';
@@ -14,13 +14,13 @@ import { User } from '../model/User';
 })
 export class ChatService {
   currentUser: User = null;
+  private newMessageSubject = new Subject<any>();
 
   constructor(
     private afAuth: Auth,
     private firestore: Firestore
   ) {
     this.afAuth.onAuthStateChanged(user => {
-      console.log('Changed: ', user);
       this.currentUser  = user;
     });
   }
@@ -28,7 +28,6 @@ export class ChatService {
   async signUp({email, password, username}) {
    const credential = await createUserWithEmailAndPassword(this.afAuth, email, password);
 
-   console.log('result: ', credential);
    const uid = credential.user.uid;
 
    const userDocRef = doc(this.firestore, `users/${uid}`);
@@ -73,7 +72,6 @@ export class ChatService {
     return this.getUsers().pipe(
       switchMap(res => {
         users = res;
-        console.log('all users: ', users);
         const messagesDocRef = collection(this.firestore, `messages`);
         const q = query(messagesDocRef, orderBy('createdAt'));
         return collectionData(q, {idField: 'id'}) as Observable<Message[]>;
@@ -83,7 +81,7 @@ export class ChatService {
           m.fromName = this.getUserForMsg(m.from, users);
           m.myMsg = this.currentUser.uid === m.from;
         }
-        console.log('all messages: ', messages);
+        this.sendIsNewMessageArrived(true);
         return messages;
       })
     );
@@ -101,6 +99,14 @@ export class ChatService {
       }
     }
     return 'Deleted';
+  }
+
+  sendIsNewMessageArrived(isNewMessageArrived: boolean) {
+    this.newMessageSubject.next(isNewMessageArrived);
+  }
+
+  getIsNewMessageArrived() {
+    return this.newMessageSubject.asObservable();
   }
 
 }
