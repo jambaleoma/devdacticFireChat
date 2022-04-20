@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Auth } from '@angular/fire/auth';
-import { doc, docData, Firestore, setDoc } from '@angular/fire/firestore';
+import { Auth, User } from '@angular/fire/auth';
+import { addDoc, collection, doc, docData, Firestore, serverTimestamp } from '@angular/fire/firestore';
 import { ref, Storage } from '@angular/fire/storage';
 import { Photo } from '@capacitor/camera';
 import { getDownloadURL, uploadString } from 'firebase/storage';
@@ -10,11 +10,17 @@ import { getDownloadURL, uploadString } from 'firebase/storage';
 })
 export class ImageService {
 
+  currentUser: User = null;
+
   constructor(
     private auth: Auth,
     private firestore: Firestore,
     private storage: Storage
-  ) { }
+  ) {
+    this.auth.onAuthStateChanged(user => {
+      this.currentUser  = user;
+    });
+  }
 
   getUserProfile() {
     const user = this.auth.currentUser;
@@ -29,6 +35,14 @@ export class ImageService {
 
     try {
       await uploadString(storageRef, cameraFile.base64String, 'base64');
+      const imageUrl = await getDownloadURL(storageRef);
+      const messagesDocRef = collection(this.firestore, `messagesTest`);
+      await addDoc(messagesDocRef, {
+      base64String: imageUrl,
+      from: this.currentUser.uid,
+      createdAt: serverTimestamp(),
+      image: true
+    });
       return true;
     } catch (e) {
       return null;
