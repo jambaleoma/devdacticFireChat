@@ -1,11 +1,14 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "devdacticFireChat",
+	"appId": "com.jambaleoma.firechat",
+	"appName": "Smart Monitoring",
 	"webDir": "www",
 	"bundledWebRuntime": false,
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 3000
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
     }
   },
   "cordova": {}

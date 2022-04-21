@@ -21,7 +21,7 @@ export class ChatService {
     private firestore: Firestore
   ) {
     this.afAuth.onAuthStateChanged(user => {
-      this.currentUser  = user;
+      this.currentUser = user;
     });
   }
 
