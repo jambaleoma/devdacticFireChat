@@ -137,8 +137,16 @@ export class ChatPage implements OnInit {
 
   checkUserToChat() {
     this.chatService.getUsers().subscribe((res) => {
-      this.userToChat = res.find((val) => val.email !== this.chatService.currentUser.email);
+      this.userToChat = res.find((val) => val?.email !== this.chatService.currentUser?.email);
     });
+  }
+
+  setIsTyping(value) {
+    if (value) {
+      this.chatService.setIsTyping(true);
+    } else {
+      this.chatService.setIsTyping(false);
+    }
   }
 
 }
