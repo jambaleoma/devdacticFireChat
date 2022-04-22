@@ -35,3 +35,7 @@
 ion-content.background{
   --background: linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.66)),url(/assets/image/bg_chat.png)
 }
+
+.sc-ion-buttons-ios-s ion-button {
+  --padding-start: 10px;
+}
