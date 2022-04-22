@@ -1,5 +1,5 @@
 {
-	"appId": "io.ionic.starter",
+	"appId": "com.jambaleoma.firechat",
 	"appName": "Love Chat",
 	"webDir": "www",
 	"bundledWebRuntime": false,

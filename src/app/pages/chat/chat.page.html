@@ -1,6 +1,17 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Open Chat</ion-title>
+    <ion-item style="--background: transparent;" lines="none">
+      <ion-avatar slot="start">
+        <img [src]="userToChat?.avatar" />
+      </ion-avatar>
+      <ion-label>
+        <h2 style="color: white;"> {{ userToChat?.username }} </h2>
+        <p *ngIf="userToChat?.isTyping" style="color: white;">sta scrivendo...</p>
+        <p *ngIf="userToChat?.isOnline && !userToChat?.isTyping" style="color: white;">online</p>
+        <p *ngIf="!userToChat?.isTyping && !userToChat?.isOnline" style="color: white;">Utlimo Accesso
+          {{userToChat?.lastAccess?.toMillis() | date:'shortTime'}} </p>
+      </ion-label>
+    </ion-item>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="scrollToBottom(1)">
         <ion-icon name="arrow-down-outline" slot="icon-only"></ion-icon>
@@ -16,12 +27,12 @@
   <ion-grid>
     <ion-row *ngFor="let message of messages | async">
       <ion-col size="9" [offset]="message.myMsg ? 3 : 0" class="message"
-       [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
+        [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
 
-       <b>{{ message.fromName }}</b>
-       <img *ngIf="message?.image" [src]="message.base64String" />
-       <div>{{ message.msg }}</div>
-       <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
+        <b>{{ message.fromName }}</b>
+        <img *ngIf="message?.image" [src]="message.base64String" />
+        <div>{{ message.msg }}</div>
+        <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
 
       </ion-col>
     </ion-row>
@@ -46,12 +57,13 @@
   <ion-toolbar color="light">
     <ion-row class="ion-align-items-center">
       <ion-col size="8" offset="2">
-        <ion-textarea autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg"></ion-textarea>
+        <ion-textarea (ionChange)="setIsTyping(newMsg)" autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
+        </ion-textarea>
       </ion-col>
       <ion-col size="2">
-        <ion-button expand="block" fill="clear" color="primary" [disabled]="newMsg === ''"
-         class="msg-btn" (click)="sendMessage()">
-         <ion-icon name="send" slot="icon-only"></ion-icon>
+        <ion-button expand="block" fill="clear" color="primary" [disabled]="newMsg === ''" class="msg-btn"
+          (click)="sendMessage()">
+          <ion-icon name="send" slot="icon-only"></ion-icon>
         </ion-button>
       </ion-col>
     </ion-row>

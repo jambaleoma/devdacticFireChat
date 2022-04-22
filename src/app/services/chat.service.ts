@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { collectionData, docData, Firestore } from '@angular/fire/firestore';
+import { collectionData, Firestore } from '@angular/fire/firestore';
 import { Photo } from '@capacitor/camera';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { addDoc, collection, doc, limit, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, orderBy, query, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { Observable, Subject } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { Message } from '../model/Message';
 import { User } from '../model/User';
 
@@ -13,6 +14,7 @@ import { User } from '../model/User';
   providedIn: 'root'
 })
 export class ChatService {
+  isTestDevelopedActive: boolean = environment.isTestDevelopedActive;
   currentUser: User = null;
   private newMessageSubject = new Subject<any>();
 
@@ -21,7 +23,7 @@ export class ChatService {
     private firestore: Firestore
   ) {
     this.afAuth.onAuthStateChanged(user => {
-      this.currentUser  = user;
+      this.currentUser = user;
     });
   }
 
@@ -30,12 +32,15 @@ export class ChatService {
 
    const uid = credential.user.uid;
 
-   const userDocRef = doc(this.firestore, `users/${uid}`);
+   const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${uid}` : `usersTest/${uid}`);
 
    return setDoc(userDocRef, {
      uid,
      email: credential.user.email,
      username,
+     isOnline: true,
+     isTyping: false,
+     lastAccess: serverTimestamp()
   });
   }
 
@@ -43,12 +48,13 @@ export class ChatService {
     return signInWithEmailAndPassword(this.afAuth, email, password);
   }
 
-  signOut() {
+  async signOut() {
+    await this.setIsOnline(false);
     return signOut(this.afAuth);
   }
 
   addChatMessage(msg) {
-    const messagesDocRef = collection(this.firestore, `messages`);
+    const messagesDocRef = collection(this.firestore, !this.isTestDevelopedActive ? 'messages' : 'messagesTest');
     return addDoc(messagesDocRef, {
       msg,
       from: this.currentUser.uid,
@@ -57,7 +63,7 @@ export class ChatService {
   }
 
   addImageChatMessage(cameraFile: Photo) {
-    const messagesDocRef = collection(this.firestore, `messages`);
+    const messagesDocRef = collection(this.firestore, 'messages');
     return addDoc(messagesDocRef, {
       base64String: 'data:image/png;base64,' + cameraFile.base64String,
       from: this.currentUser.uid,
@@ -72,14 +78,14 @@ export class ChatService {
     return this.getUsers().pipe(
       switchMap(res => {
         users = res;
-        const messagesDocRef = collection(this.firestore, `messages`);
+        const messagesDocRef = collection(this.firestore, !this.isTestDevelopedActive ? 'messages' : 'messagesTest');
         const q = query(messagesDocRef, orderBy('createdAt'));
         return collectionData(q, {idField: 'id'}) as Observable<Message[]>;
       }),
       map(messages => {
         for (const m of messages) {
           m.fromName = this.getUserForMsg(m.from, users);
-          m.myMsg = this.currentUser.uid === m.from;
+          m.myMsg = this.currentUser?.uid === m.from;
         }
         this.sendIsNewMessageArrived(true);
         return messages;
@@ -88,7 +94,7 @@ export class ChatService {
   }
 
   getUsers(): Observable<User[]> {
-    const usersRef = collection(this.firestore, 'users');
+    const usersRef = collection(this.firestore, !this.isTestDevelopedActive ? 'users' : 'usersTest');
     return collectionData(usersRef, {idField: 'uid'}) as Observable<User[]>;
   }
 
@@ -107,6 +113,30 @@ export class ChatService {
 
   getIsNewMessageArrived() {
     return this.newMessageSubject.asObservable();
+  }
+
+  async setIsOnline(isOnline: boolean) {
+    const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${this.currentUser?.uid}` : `usersTest/${this.currentUser?.uid}`);
+    if (!isOnline) {
+      await this.setLastAccess();
+    }
+    return updateDoc(userDocRef, {
+      isOnline: isOnline
+    });
+  }
+
+  setIsTyping(isTyping: boolean) {
+    const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${this.currentUser?.uid}` : `usersTest/${this.currentUser?.uid}`);
+    return updateDoc(userDocRef, {
+      isTyping: isTyping
+    });
+  }
+
+  setLastAccess() {
+    const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${this.currentUser?.uid}` : `usersTest/${this.currentUser?.uid}`);
+    return updateDoc(userDocRef, {
+      lastAccess: serverTimestamp()
+    });
   }
 
 }

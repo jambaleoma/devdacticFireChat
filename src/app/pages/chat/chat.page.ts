@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { AlertController, IonContent, LoadingController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { Message } from 'src/app/model/Message';
+import { User } from 'src/app/model/User';
 import { ChatService } from 'src/app/services/chat.service';
 import { ImageService } from 'src/app/services/image.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -18,6 +20,9 @@ export class ChatPage implements OnInit {
 
   messages: Observable<Message[]>;
   newMsg = '';
+  userToChat: User = null;
+  isTyping = false;
+  isOnline = false;
 
   constructor(
     private chatService: ChatService,
@@ -31,6 +36,8 @@ export class ChatPage implements OnInit {
     this.messages = this.chatService.getChatMessages();
     this.checkNewMessage();
     this.scrollToBottom(1000);
+    this.resetBadgeCount();
+    this.checkUserToChat();
   }
 
   sendMessage() {
@@ -122,6 +129,24 @@ export class ChatPage implements OnInit {
     setTimeout(() => {
       this.content.scrollToBottom();
     }, timeout);
+  }
+
+  resetBadgeCount() {
+    PushNotifications.removeAllDeliveredNotifications();
+  }
+
+  checkUserToChat() {
+    this.chatService.getUsers().subscribe((res) => {
+      this.userToChat = res.find((val) => val?.email !== this.chatService.currentUser?.email);
+    });
+  }
+
+  setIsTyping(value) {
+    if (value) {
+      this.chatService.setIsTyping(true);
+    } else {
+      this.chatService.setIsTyping(false);
+    }
   }
 
 }
