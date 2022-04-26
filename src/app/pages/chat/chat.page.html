@@ -6,9 +6,8 @@
       </ion-avatar>
       <ion-label>
         <h2 style="color: white;"> {{ userToChat?.username }} </h2>
-        <p *ngIf="userToChat?.isTyping" style="color: white;">sta scrivendo...</p>
-        <p *ngIf="userToChat?.isOnline && !userToChat?.isTyping" style="color: white;">online</p>
-        <p *ngIf="!userToChat?.isTyping && !userToChat?.isOnline" style="color: white;">Utlimo Accesso
+        <p *ngIf="userToChat?.isOnline" style="color: white;">online</p>
+        <p *ngIf="!userToChat?.isOnline" style="color: white;">Utlimo Accesso
           {{userToChat?.lastAccess?.toMillis() | date:'shortTime'}} </p>
       </ion-label>
     </ion-item>
@@ -30,7 +29,7 @@
         [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
 
         <b>{{ message.fromName }}</b>
-        <img *ngIf="message?.image" [src]="message.base64String" />
+        <img *ngIf="message?.image" [src]="message.base64String" (click)="openPreview(message.base64String)" />
         <div>{{ message.msg }}</div>
         <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
 
@@ -57,7 +56,7 @@
   <ion-toolbar color="light">
     <ion-row class="ion-align-items-center">
       <ion-col size="8" offset="2">
-        <ion-textarea (ionChange)="setIsTyping(newMsg)" autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
+        <ion-textarea autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
         </ion-textarea>
       </ion-col>
       <ion-col size="2">

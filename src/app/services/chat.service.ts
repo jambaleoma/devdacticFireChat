@@ -39,7 +39,6 @@ export class ChatService {
      email: credential.user.email,
      username,
      isOnline: true,
-     isTyping: false,
      lastAccess: serverTimestamp()
   });
   }
@@ -122,13 +121,6 @@ export class ChatService {
     }
     return updateDoc(userDocRef, {
       isOnline: isOnline
-    });
-  }
-
-  setIsTyping(isTyping: boolean) {
-    const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${this.currentUser?.uid}` : `usersTest/${this.currentUser?.uid}`);
-    return updateDoc(userDocRef, {
-      isTyping: isTyping
     });
   }
 
