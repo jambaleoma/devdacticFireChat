@@ -1,8 +1,9 @@
+import { ImageModalPage } from './../../image-modal/image-modal.page';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { PushNotifications } from '@capacitor/push-notifications';
-import { AlertController, IonContent, LoadingController } from '@ionic/angular';
+import { AlertController, IonContent, LoadingController, ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { Message } from 'src/app/model/Message';
 import { User } from 'src/app/model/User';
@@ -21,7 +22,6 @@ export class ChatPage implements OnInit {
   messages: Observable<Message[]>;
   newMsg = '';
   userToChat: User = null;
-  isTyping = false;
   isOnline = false;
 
   constructor(
@@ -29,7 +29,8 @@ export class ChatPage implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private alertController: AlertController,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private modalCtrl: ModalController
   ) { }
 
   ngOnInit() {
@@ -66,10 +67,6 @@ export class ChatPage implements OnInit {
       const loading = await this.loadingController.create();
       await loading.present();
 
-      this.chatService.addImageChatMessage(photo).then(() => {
-        this.scrollToBottom(1);
-      });
-
       const result = await this.imageService.uploadImage(photo, imageName);
       loading.dismiss();
       this.scrollToBottom(500);
@@ -97,10 +94,6 @@ export class ChatPage implements OnInit {
       const imageName = uuidv4() + '.' + image.format;
       const loading = await this.loadingController.create();
       await loading.present();
-
-      this.chatService.addImageChatMessage(image).then(() => {
-        this.scrollToBottom(1);
-      });
 
       const result = await this.imageService.uploadImage(image, imageName);
       loading.dismiss();
@@ -140,13 +133,17 @@ export class ChatPage implements OnInit {
       this.userToChat = res.find((val) => val?.email !== this.chatService.currentUser?.email);
     });
   }
-
-  setIsTyping(value) {
-    if (value) {
-      this.chatService.setIsTyping(true);
-    } else {
-      this.chatService.setIsTyping(false);
-    }
+  
+  async openPreview(base64String) {
+    const modal = await this.modalCtrl.create({
+      component: ImageModalPage,
+      componentProps: {
+        base64String
+      },
+      cssClass: 'transparent-modal'
+    });
+    modal.present();
   }
+
 
 }

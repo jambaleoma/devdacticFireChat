@@ -5,6 +5,5 @@ export interface User {
   email: string;
   avatar?: string;
   isOnline?: boolean;
-  isTyping?: boolean;
   lastAccess?: Timestamp;
 }
