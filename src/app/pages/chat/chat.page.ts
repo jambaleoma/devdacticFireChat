@@ -1,3 +1,4 @@
+import { InfoModalPage } from './../../info-modal/info-modal.page';
 import { ImageModalPage } from './../../image-modal/image-modal.page';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -108,6 +109,14 @@ export class ChatPage implements OnInit {
         await alert.present();
       }
     }
+  }
+
+  async emailNotification() {
+    const modal = await this.modalCtrl.create({
+      component: InfoModalPage,
+      cssClass: 'transparent-modal'
+    });
+    modal.present();
   }
 
   checkNewMessage() {
