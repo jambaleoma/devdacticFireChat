@@ -39,3 +39,7 @@ ion-content.background{
 .sc-ion-buttons-ios-s ion-button {
   --padding-start: 10px;
 }
+
+.selectable {
+  -webkit-user-select: initial;
+}
