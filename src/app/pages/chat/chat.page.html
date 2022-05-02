@@ -30,7 +30,7 @@
 
         <b>{{ message.fromName }}</b>
         <img *ngIf="message?.image" [src]="message.base64String" (click)="openPreview(message.base64String)" />
-        <div>{{ message.msg }}</div>
+        <div class="selectable">{{ message.msg }}</div>
         <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
 
       </ion-col>
