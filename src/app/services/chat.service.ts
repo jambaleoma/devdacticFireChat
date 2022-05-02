@@ -3,7 +3,7 @@ import { Auth } from '@angular/fire/auth';
 import { collectionData, Firestore } from '@angular/fire/firestore';
 import { Photo } from '@capacitor/camera';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { addDoc, collection, doc, orderBy, query, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, limitToLast, orderBy, query, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { Observable, Subject } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -71,14 +71,14 @@ export class ChatService {
     });
   }
 
-  getChatMessages() {
+  getChatMessages(numeberOfMessage, toSend = true) {
     let users = [];
 
     return this.getUsers().pipe(
       switchMap(res => {
         users = res;
         const messagesDocRef = collection(this.firestore, !this.isTestDevelopedActive ? 'messages' : 'messagesTest');
-        const q = query(messagesDocRef, orderBy('createdAt'));
+        const q = query(messagesDocRef, orderBy('createdAt'), limitToLast(numeberOfMessage));
         return collectionData(q, {idField: 'id'}) as Observable<Message[]>;
       }),
       map(messages => {
@@ -86,7 +86,7 @@ export class ChatService {
           m.fromName = this.getUserForMsg(m.from, users);
           m.myMsg = this.currentUser?.uid === m.from;
         }
-        this.sendIsNewMessageArrived(true);
+        this.sendIsNewMessageArrived(toSend);
         return messages;
       })
     );

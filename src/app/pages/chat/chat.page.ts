@@ -24,6 +24,9 @@ export class ChatPage implements OnInit {
   newMsg = '';
   userToChat: User = null;
   isOnline = false;
+  messageLength = 10;
+  previousMessageToAdd = 10;
+  maxMessageSizeNumber = 500;
 
   constructor(
     private chatService: ChatService,
@@ -35,7 +38,7 @@ export class ChatPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.messages = this.chatService.getChatMessages();
+    this.messages = this.chatService.getChatMessages(this.messageLength);
     this.checkNewMessage();
     this.scrollToBottom(1000);
     this.resetBadgeCount();
@@ -53,6 +56,18 @@ export class ChatPage implements OnInit {
     this.chatService.signOut().then(() => {
       this.router.navigateByUrl('/', { replaceUrl: true});
     });
+  }
+
+  loadPreviousMessage(event) {
+    setTimeout(() => {
+      const msgToGet = this.messageLength + this.previousMessageToAdd;
+      if (this.maxMessageSizeNumber > msgToGet) {
+        this.messages = this.chatService.getChatMessages(this.messageLength + this.previousMessageToAdd, false);
+        this.scrollToTop(1);
+        this.messageLength = this.messageLength + this.previousMessageToAdd;
+        event.target.complete();
+      }
+    }, 1000);
   }
 
   async takePhoto() {
@@ -130,6 +145,12 @@ export class ChatPage implements OnInit {
   scrollToBottom(timeout: number) {
     setTimeout(() => {
       this.content.scrollToBottom();
+    }, timeout);
+  }
+
+  scrollToTop(timeout: number) {
+    setTimeout(() => {
+      this.content.scrollToTop();
     }, timeout);
   }
 

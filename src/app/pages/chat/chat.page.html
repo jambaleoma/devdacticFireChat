@@ -22,7 +22,13 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding background">
+<ion-content class="ion-padding background" fullscreen>
+
+  <ion-infinite-scroll position="top" threshold="100px" (ionInfinite)="loadPreviousMessage($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Caricamento messaggi precedenti...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
   <ion-grid>
     <ion-row *ngFor="let message of messages | async">
       <ion-col size="9" [offset]="message.myMsg ? 3 : 0" class="message"
