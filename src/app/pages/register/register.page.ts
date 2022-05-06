@@ -47,7 +47,7 @@ export class RegisterPage implements OnInit {
 
     this.chatService.signUp(this.registerForm.value).then(user => {
       loading.dismiss();
-      this.router.navigateByUrl('/chat', {replaceUrl: true});
+      this.router.navigateByUrl('/chat', { replaceUrl: true });
     }, async (err) => {
       loading.dismiss();
       const alert = await this.alertController.create({
@@ -61,7 +61,7 @@ export class RegisterPage implements OnInit {
   }
 
   goToLogin() {
-    this.router.navigateByUrl('/', {replaceUrl: true});
+    this.router.navigateByUrl('/', { replaceUrl: true });
   }
 
 }

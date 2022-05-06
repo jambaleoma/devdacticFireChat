@@ -7,7 +7,7 @@
       <ion-label>
         <h2 style="color: white;"> {{ userToChat?.username }} </h2>
         <p *ngIf="userToChat?.isOnline" style="color: white;">online</p>
-        <p *ngIf="!userToChat?.isOnline" style="color: white;">Utlimo Accesso
+        <p *ngIf="!userToChat?.isOnline" style="color: white;">Ultimo Accesso
           {{userToChat?.lastAccess?.toMillis() | date:'shortTime'}} </p>
       </ion-label>
     </ion-item>
@@ -24,10 +24,10 @@
 
 <ion-content class="ion-padding background" fullscreen>
 
-  <ion-infinite-scroll position="top" threshold="100px" (ionInfinite)="loadPreviousMessage($event)">
-    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Caricamento messaggi precedenti...">
-    </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  <ion-button (click)="loadPreviousMessage($event)" expand="block" fill="clear" shape="round">
+    Carica messaggi precedenti
+    <ion-icon slot="start" name="refresh-outline"></ion-icon>
+  </ion-button>
 
   <ion-grid>
     <ion-row *ngFor="let message of messages | async">

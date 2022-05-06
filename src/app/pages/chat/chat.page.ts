@@ -54,20 +54,23 @@ export class ChatPage implements OnInit {
 
   signOut() {
     this.chatService.signOut().then(() => {
-      this.router.navigateByUrl('/', { replaceUrl: true});
+      this.router.navigateByUrl('/', { replaceUrl: true });
     });
   }
 
-  loadPreviousMessage(event) {
-    setTimeout(() => {
+  async loadPreviousMessage(event) {
       const msgToGet = this.messageLength + this.previousMessageToAdd;
       if (this.maxMessageSizeNumber > msgToGet) {
-        this.messages = this.chatService.getChatMessages(this.messageLength + this.previousMessageToAdd, false);
+        const loading = await this.loadingController.create({
+          message: 'Attendi amore mio...',
+          duration: 1000,
+        });
+        await loading.present();
+        this.messages = await this.chatService.getChatMessages(this.messageLength + this.previousMessageToAdd, false);
         this.scrollToTop(1);
         this.messageLength = this.messageLength + this.previousMessageToAdd;
         event.target.complete();
       }
-    }, 1000);
   }
 
   async takePhoto() {
@@ -163,7 +166,7 @@ export class ChatPage implements OnInit {
       this.userToChat = res.find((val) => val?.email !== this.chatService.currentUser?.email);
     });
   }
-  
+
   async openPreview(base64String) {
     const modal = await this.modalCtrl.create({
       component: ImageModalPage,

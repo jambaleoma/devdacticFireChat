@@ -43,7 +43,7 @@ export class LoginPage implements OnInit {
     this.chatService.signIn(this.credentialForm.value).then(user => {
       loading.dismiss();
       this.chatService.setIsOnline(true);
-      this.router.navigateByUrl('/chat', {replaceUrl: true});
+      this.router.navigateByUrl('/chat', { replaceUrl: true });
     }, async (err) => {
       loading.dismiss();
       const alert = await this.alertController.create({
@@ -57,7 +57,7 @@ export class LoginPage implements OnInit {
   }
 
   goToRegister() {
-    this.router.navigateByUrl('/register', {replaceUrl: true});
+    this.router.navigateByUrl('/register', { replaceUrl: true });
   }
 
 }
