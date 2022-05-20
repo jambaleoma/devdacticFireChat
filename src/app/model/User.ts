@@ -6,4 +6,6 @@ export interface User {
   avatar?: string;
   isOnline?: boolean;
   lastAccess?: Timestamp;
+  info?: string;
+  infoUpdateDate?: Timestamp;
 }

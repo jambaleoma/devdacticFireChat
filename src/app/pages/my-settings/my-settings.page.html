@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBackToChat()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Impostazioni</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-card class="cardAlignCenter cardMarignTopBottom">
+    <ion-avatar class="cardAvatar">
+      <img [src]="user?.avatar" />
+    </ion-avatar>
+    <ion-card-header>
+      <ion-card-subtitle style="text-transform: lowercase; font-size: 10px">
+        {{ user?.email | lowercase }}
+      </ion-card-subtitle>
+      <ion-card-title (click)="changeUsername()">
+        {{ user?.username }}
+        <ion-icon name="pencil"></ion-icon>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Ultimo Accesso {{ user?.lastAccess?.toMillis() | date:'shortTime' }}
+    </ion-card-content>
+  </ion-card>
+  
+  <ion-card class="cardMarignTopBottom">
+    <ion-card-header>
+      <ion-card-title style="font-size: 18px" (click)="changeInfo()">
+        {{ user?.info | lowercase }}
+        <ion-icon name="pencil"></ion-icon>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ user?.infoUpdateDate?.toMillis() | date }}
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

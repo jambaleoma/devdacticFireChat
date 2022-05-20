@@ -22,6 +22,18 @@ const routes: Routes = [
     path: 'info-modal',
     loadChildren: () => import('./info-modal/info-modal.module').then( m => m.InfoModalPageModule)
   },
+  {
+    path: 'change-modal',
+    loadChildren: () => import('./change-modal/change-modal.module').then( m => m.ChangeModalPageModule)
+  },
+  {
+    path: 'user-chat-settings',
+    loadChildren: () => import('./pages/user-chat-settings/user-chat-settings.module').then( m => m.UserChatSettingsPageModule)
+  },
+  {
+    path: 'my-settings',
+    loadChildren: () => import('./pages/my-settings/my-settings.module').then( m => m.MySettingsPageModule)
+  }
 ];
 
 @NgModule({

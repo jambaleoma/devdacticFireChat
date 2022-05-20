@@ -131,4 +131,16 @@ export class ChatService {
     });
   }
 
+  updateUserData(parameter, dataParameter) {
+    const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${this.currentUser?.uid}` : `usersTest/${this.currentUser?.uid}`);
+    let data = {
+      [parameter]: dataParameter,
+      infoUpdateDate: null
+    }
+    if (parameter === 'info') {
+      data.infoUpdateDate = serverTimestamp()
+    }
+    return updateDoc(userDocRef, data);
+  }
+
 }

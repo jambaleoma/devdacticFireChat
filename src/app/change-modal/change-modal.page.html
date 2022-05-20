@@ -1,0 +1,12 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title style="padding: 0;">Modifica la tua {{changingParameter}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item lines="none">
+    <ion-textarea [placeholder]="changingParameterData" [(ngModel)]="parameter" class="edit-text-area"></ion-textarea>
+  </ion-item>
+  <ion-button (click)="saveChanges()" expand="full" color="secondary"> Salva modifica </ion-button>
+</ion-content>
