@@ -58,6 +58,10 @@ export class ChatPage implements OnInit {
     });
   }
 
+  goToUserChatSettings() {
+    this.router.navigateByUrl('/user-chat-settings', { replaceUrl: true });
+  }
+
   async loadPreviousMessage(event) {
       const msgToGet = this.messageLength + this.previousMessageToAdd;
       if (this.maxMessageSizeNumber > msgToGet) {
@@ -75,7 +79,7 @@ export class ChatPage implements OnInit {
 
   async takePhoto() {
     const photo = await Camera.getPhoto({
-      quality: 10,
+      quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Camera
@@ -103,7 +107,7 @@ export class ChatPage implements OnInit {
 
   async documentAttach() {
     const image = await Camera.getPhoto({
-      quality: 10,
+      quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Photos

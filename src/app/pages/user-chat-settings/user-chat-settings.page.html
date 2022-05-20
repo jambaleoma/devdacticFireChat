@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBackToChat()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="handleButtonClick($event)">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Impostazioni</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-card class="cardAlignCenter cardMarignTopBottom">
+    <ion-avatar class="cardAvatar">
+      <img [src]="userToChat?.avatar" />
+    </ion-avatar>
+    <ion-card-header>
+      <ion-card-subtitle style="text-transform: lowercase; font-size: 10px">
+        {{ userToChat?.email | lowercase }}
+      </ion-card-subtitle>
+      <ion-card-title>
+        {{ userToChat?.username }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Ultimo Accesso {{ userToChat?.lastAccess?.toMillis() | date:'shortTime' }}
+    </ion-card-content>
+  </ion-card>
+  
+  <ion-card class="cardMarignTopBottom">
+    <ion-card-header>
+      <ion-card-title>
+        {{ userToChat?.info | lowercase }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ userToChat?.infoUpdateDate?.toMillis() | date }}
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="cardMarignTopBottom">
+    <ion-card-header>
+      <ion-card-subtitle style="text-transform: capitalize; font-size: 10px">
+        Media Ricevuti
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-thumbnail *ngFor="let image of imageListUrlReceived" style="display: inline-flex" (click)="openPreview(image)">
+        <img [src]="image"/>
+      </ion-thumbnail>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="cardMarignTopBottom">
+    <ion-card-header>
+      <ion-card-subtitle style="text-transform: capitalize; font-size: 10px">
+        Media Inviati
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-thumbnail *ngFor="let image of imageListUrlSend" style="display: inline-flex" (click)="openPreview(image)">
+        <img [src]="image"/>
+      </ion-thumbnail>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

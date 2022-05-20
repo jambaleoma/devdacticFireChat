@@ -3,7 +3,7 @@ import { Auth, User } from '@angular/fire/auth';
 import { addDoc, collection, doc, docData, Firestore, serverTimestamp } from '@angular/fire/firestore';
 import { ref, Storage } from '@angular/fire/storage';
 import { Photo } from '@capacitor/camera';
-import { getDownloadURL, uploadString } from 'firebase/storage';
+import { getDownloadURL, list, uploadString } from 'firebase/storage';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -13,6 +13,7 @@ export class ImageService {
 
   currentUser: User = null;
   isTestDevelopedActive: boolean = environment.isTestDevelopedActive;
+  imagesListUrl: string[] = [];
 
   constructor(
     private auth: Auth,
@@ -28,6 +29,44 @@ export class ImageService {
     const user = this.auth.currentUser;
     const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${user.uid}` : `usersTest/${user.uid}`);
     return docData(userDocRef);
+  }
+
+  async getImagesListSend() {
+    this.imagesListUrl = [];
+    const user = this.auth.currentUser;
+    const path = `uploads/${user?.uid}`;
+    const storageRef = ref(this.storage, path);
+
+    try {
+      const listImagesRef = await list(storageRef);
+      for (const imageRef of listImagesRef.items) {
+        const storageRef = ref(this.storage, imageRef.fullPath);
+        const imageUrl = await getDownloadURL(storageRef);
+        this.imagesListUrl.push(imageUrl);
+      }
+      return this.imagesListUrl;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async getImagesListReceived(userToChat) {
+    this.imagesListUrl = [];
+    const user = this.auth.currentUser;
+    const path = `uploads/${userToChat?.uid}`;
+    const storageRef = ref(this.storage, path);
+
+    try {
+      const listImagesRef = await list(storageRef);
+      for (const imageRef of listImagesRef.items) {
+        const storageRef = ref(this.storage, imageRef.fullPath);
+        const imageUrl = await getDownloadURL(storageRef);
+        this.imagesListUrl.push(imageUrl);
+      }
+      return this.imagesListUrl;
+    } catch (e) {
+      return null;
+    }
   }
 
   async uploadImage(cameraFile: Photo, fileName: string) {
