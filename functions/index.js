@@ -22,7 +22,7 @@ exports.sendEmailNotification=functions.firestore
       authData.sendMail({
         from: `${data.from}`,
         to: `${data.to}`,
-        subject: "Notifica chatApp",
+        subject: "📢Notifica App📢",
         text: `${data.text}`,
       })
           .then((res)=>console.log("successfully sent that mail"))
