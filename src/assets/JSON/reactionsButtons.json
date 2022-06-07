@@ -1,0 +1,28 @@
+{
+    "reactionButtons": [
+        {
+            "text": "👍🏻",
+            "value": "ok"
+        },
+        {
+            "text": "❤️",
+            "value": "love"
+        },
+        {
+            "text": "😂",
+            "value": "lol"
+        },
+        {
+            "text": "😮",
+            "value": "wow"
+        },
+        {
+            "text": "😢",
+            "value": "cry"
+        },
+        {
+            "text": "🙏🏻",
+            "value": "sorry"
+        }
+    ]
+}

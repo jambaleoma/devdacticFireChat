@@ -61,6 +61,17 @@ export class ChatService {
     });
   }
 
+  addChatMessageReply(msg, replyAuthor?, replyText?) {
+    const messagesDocRef = collection(this.firestore, !this.isTestDevelopedActive ? 'messages' : 'messagesTest');
+    return addDoc(messagesDocRef, {
+      msg,
+      from: this.currentUser.uid,
+      createdAt: serverTimestamp(),
+      replyAuthor,
+      replyText
+    });
+  }
+
   addImageChatMessage(cameraFile: Photo) {
     const messagesDocRef = collection(this.firestore, 'messages');
     return addDoc(messagesDocRef, {
@@ -141,6 +152,13 @@ export class ChatService {
       data.infoUpdateDate = serverTimestamp()
     }
     return updateDoc(userDocRef, data);
+  }
+
+  updateMessageReaction(idMessage, reaction) {
+    const messageDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `messages/${idMessage}` : `messagesTest/${idMessage}`);
+    return updateDoc(messageDocRef, {
+      reaction
+    });
   }
 
 }

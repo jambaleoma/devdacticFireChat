@@ -1,3 +1,4 @@
+import { ReactionPipePipe } from './../../pipes/reaction-pipe.pipe';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +13,6 @@ import { ChatPage } from './chat.page';
     IonicModule,
     ChatPageRoutingModule
   ],
-  declarations: [ChatPage]
+  declarations: [ChatPage, ReactionPipePipe]
 })
 export class ChatPageModule {}

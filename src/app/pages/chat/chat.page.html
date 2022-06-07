@@ -30,17 +30,45 @@
   </ion-button>
 
   <ion-grid>
-    <ion-row *ngFor="let message of messages | async">
-      <ion-col size="9" [offset]="message.myMsg ? 3 : 0" class="message"
-        [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
+    <ion-list #messagesList>
 
-        <b>{{ message.fromName }}</b>
-        <img *ngIf="message?.image" [src]="message.base64String" (click)="openPreview(message.base64String)" />
-        <div class="selectable">{{ message.msg }}</div>
-        <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
+      <ion-item-sliding *ngFor="let message of messages | async">
+        <ion-item>
+          <ion-col size="9" [offset]="message.myMsg ? 3 : 0" class="message"
+            [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
+            <div *ngIf="message.replyAuthor && message.replyText" style="border: white solid 1px;">
+              Risposta del Messaggio:
+              <b>{{ message.replyAuthor }}</b>
+              <div>{{ message.replyText }}</div>
+            </div>
+            <b>{{ message.fromName }}</b>
+            <img *ngIf="message?.image" [src]="message.base64String" (click)="openPreview(message.base64String)" />
+            <div class="selectable">{{ message.msg }}</div>
+            <div class="time ion-text-right">{{ message.createdAt?.toMillis() | date:'short' }}</div>
+          </ion-col>
+        </ion-item>
 
-      </ion-col>
-    </ion-row>
+        <ion-fab vertical="top" horizontal="end" slot="fixed" *ngIf="!message.myMsg && message.reaction">
+          <ion-fab-button color="tertiary" (click)="openEmoji(message)">
+            {{message.reaction | reactionPipe}}
+          </ion-fab-button>
+        </ion-fab>
+    
+        <ion-item-options side="start" (click)="replyMessage(message)">
+          <ion-item-option [ngClass]="{ 'my-message': message.myMsg, 'other-message': !message.myMsg }">
+            <ion-icon slot="icon-only" name="return-up-back-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+        <ion-item-options side="end" (click)="openEmoji(message)" *ngIf="!message.myMsg && !message.reaction">
+          <ion-item-option class="other-message">
+            <ion-icon slot="icon-only" name="happy-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+    
+      </ion-item-sliding>
+
+    </ion-list>
   </ion-grid>
 </ion-content>
 
@@ -65,7 +93,7 @@
   <ion-toolbar color="light">
     <ion-row class="ion-align-items-center">
       <ion-col size="8" offset="2">
-        <ion-textarea autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
+        <ion-textarea #newMsgInput autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
         </ion-textarea>
       </ion-col>
       <ion-col size="2">
