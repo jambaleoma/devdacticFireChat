@@ -43,3 +43,18 @@ ion-content.background{
 .selectable {
   -webkit-user-select: initial;
 }
+
+ion-list {
+  background-color: transparent !important;
+}
+
+ion-item::part(native) {
+  //WRITE ALL YOUR CSS RULES HERE
+background-color: transparent !important;
+--inner-border-width: 0px 0px 0px 0px;
+  /** and lots more **/
+}
+
+.item-options-ios.item-options-end {
+  border-bottom-width: 0px !important;
+}

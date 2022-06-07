@@ -4,13 +4,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { PushNotifications } from '@capacitor/push-notifications';
-import { AlertController, IonContent, LoadingController, ModalController } from '@ionic/angular';
+import { AlertController, IonContent, IonTextarea, LoadingController, ModalController, PickerController, ToastController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { Message } from 'src/app/model/Message';
 import { User } from 'src/app/model/User';
 import { ChatService } from 'src/app/services/chat.service';
 import { ImageService } from 'src/app/services/image.service';
 import { v4 as uuidv4 } from 'uuid';
+import reactionButtons from './../../../assets/JSON/reactionsButtons.json';
 
 @Component({
   selector: 'app-chat',
@@ -19,6 +20,7 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class ChatPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
+  @ViewChild('newMsgInput') newMsgInput: IonTextarea;
 
   messages: Observable<Message[]>;
   newMsg = '';
@@ -27,6 +29,12 @@ export class ChatPage implements OnInit {
   messageLength = 10;
   previousMessageToAdd = 10;
   maxMessageSizeNumber = 500;
+  replyMessageValue = false;
+  replyMessageAuthor = '';
+  replyMessageMsg = '';
+  public reactionButtons = reactionButtons.reactionButtons;
+
+  @ViewChild('messagesList') list;
 
   constructor(
     private chatService: ChatService,
@@ -34,7 +42,9 @@ export class ChatPage implements OnInit {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private imageService: ImageService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private pickerController: PickerController,
+    private toastController: ToastController
   ) { }
 
   ngOnInit() {
@@ -46,10 +56,19 @@ export class ChatPage implements OnInit {
   }
 
   sendMessage() {
-    this.chatService.addChatMessage(this.newMsg).then(() => {
-      this.newMsg = '';
-      this.scrollToBottom(1000);
-    });
+    if (this.replyMessageValue) {
+      this.chatService.addChatMessageReply(this.newMsg, this.replyMessageAuthor, this.replyMessageMsg).then(() => {
+        this.newMsg = '';
+        this.scrollToBottom(1000);
+        this.toastController.dismiss();
+      });
+    } else {
+      this.chatService.addChatMessage(this.newMsg).then(() => {
+        this.newMsg = '';
+        this.scrollToBottom(1000);
+      });
+    }
+    this.replyMessageValue = false;
   }
 
   signOut() {
@@ -63,18 +82,18 @@ export class ChatPage implements OnInit {
   }
 
   async loadPreviousMessage(event) {
-      const msgToGet = this.messageLength + this.previousMessageToAdd;
-      if (this.maxMessageSizeNumber > msgToGet) {
-        const loading = await this.loadingController.create({
-          message: 'Attendi amore mio...',
-          duration: 1000,
-        });
-        await loading.present();
-        this.messages = await this.chatService.getChatMessages(this.messageLength + this.previousMessageToAdd, false);
-        this.scrollToTop(1);
-        this.messageLength = this.messageLength + this.previousMessageToAdd;
-        event.target.complete();
-      }
+    const msgToGet = this.messageLength + this.previousMessageToAdd;
+    if (this.maxMessageSizeNumber > msgToGet) {
+      const loading = await this.loadingController.create({
+        message: 'Attendi amore mio...',
+        duration: 1000,
+      });
+      await loading.present();
+      this.messages = await this.chatService.getChatMessages(this.messageLength + this.previousMessageToAdd, false);
+      this.scrollToTop(1);
+      this.messageLength = this.messageLength + this.previousMessageToAdd;
+      event.target.complete();
+    }
   }
 
   async takePhoto() {
@@ -182,5 +201,63 @@ export class ChatPage implements OnInit {
     modal.present();
   }
 
+  async openEmoji(messageToReply: Message) {
+    const picker = await this.pickerController.create({
+      buttons: [
+        {
+          text: 'Elimina',
+          handler: () => {
+            this.chatService.updateMessageReaction(messageToReply.id, null);
+            this.list.closeSlidingItems();
+          }
+        },
+        {
+          text: 'Conferma',
+          handler: (selected) => {
+            this.chatService.updateMessageReaction(messageToReply.id, selected.reaction.value);
+            this.list.closeSlidingItems();
+          }
+        }
+      ],
+      columns: [
+        {
+          name: 'reaction',
+          options: reactionButtons?.reactionButtons
+        }
+      ]
+    });
+    await picker.present();
+  }
+
+  async replyMessage(messageToReply: Message) {
+    this.setReplyMessage(true, messageToReply.fromName, messageToReply.msg);
+    const toast = await this.toastController.create({
+      header: messageToReply.fromName,
+      message: messageToReply.msg,
+      icon: 'arrow-undo-outline',      
+      position: 'top',
+      buttons: [
+        {
+          icon: 'close-circle-outline',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    this.list.closeSlidingItems();
+    this.newMsgInput.setFocus();
+    await toast.present();
+
+    const { role } = await toast.onDidDismiss();
+    this.setReplyMessage(false, null, null);
+  }
+
+  setReplyMessage(value: boolean, author: string, msg: string) {
+    this.replyMessageValue = value;
+    this.replyMessageAuthor = author;
+    this.replyMessageMsg = msg;
+  }
 
 }
