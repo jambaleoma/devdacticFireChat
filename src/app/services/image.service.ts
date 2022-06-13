@@ -25,12 +25,6 @@ export class ImageService {
     });
   }
 
-  getUserProfile() {
-    const user = this.auth.currentUser;
-    const userDocRef = doc(this.firestore, !this.isTestDevelopedActive ? `users/${user.uid}` : `usersTest/${user.uid}`);
-    return docData(userDocRef);
-  }
-
   async getImagesListSend() {
     this.imagesListUrl = [];
     const user = this.auth.currentUser;

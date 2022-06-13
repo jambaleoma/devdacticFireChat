@@ -1,15 +1,18 @@
 import { InfoModalPage } from './../../info-modal/info-modal.page';
 import { ImageModalPage } from './../../image-modal/image-modal.page';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { RecordingData, VoiceRecorder } from 'capacitor-voice-recorder';
 import { PushNotifications } from '@capacitor/push-notifications';
-import { AlertController, IonContent, IonTextarea, LoadingController, ModalController, PickerController, ToastController } from '@ionic/angular';
+import { AlertController, GestureController, IonContent, IonTextarea, LoadingController, ModalController, PickerController, ToastController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { Message } from 'src/app/model/Message';
 import { User } from 'src/app/model/User';
 import { ChatService } from 'src/app/services/chat.service';
 import { ImageService } from 'src/app/services/image.service';
+import { RecordService } from './../../services/record.service';
 import { v4 as uuidv4 } from 'uuid';
 import reactionButtons from './../../../assets/JSON/reactionsButtons.json';
 
@@ -18,23 +21,29 @@ import reactionButtons from './../../../assets/JSON/reactionsButtons.json';
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
 })
-export class ChatPage implements OnInit {
+export class ChatPage implements OnInit, AfterViewInit {
   @ViewChild(IonContent) content: IonContent;
   @ViewChild('newMsgInput') newMsgInput: IonTextarea;
 
-  messages: Observable<Message[]>;
-  newMsg = '';
-  userToChat: User = null;
-  isOnline = false;
-  messageLength = 10;
-  previousMessageToAdd = 10;
-  maxMessageSizeNumber = 500;
-  replyMessageValue = false;
-  replyMessageAuthor = '';
-  replyMessageMsg = '';
+  public messages: Observable<Message[]>;
+  public newMsg = '';
+  public userToChat: User = null;
+  public isOnline = false;
+  public messageLength = 10;
+  public previousMessageToAdd = 10;
+  public maxMessageSizeNumber = 500;
+  public replyMessageValue = false;
+  public replyMessageAuthor = '';
+  public replyMessageMsg = '';
   public reactionButtons = reactionButtons.reactionButtons;
+  public recording = false;
+  public isPlayRecord = false;
+  public durationDisplay= '';
+  public duration = 0;
 
   @ViewChild('messagesList') list;
+  @ViewChild('recordbtn', {read: ElementRef}) recordbtn: ElementRef;
+  
 
   constructor(
     private chatService: ChatService,
@@ -44,8 +53,27 @@ export class ChatPage implements OnInit {
     private imageService: ImageService,
     private modalCtrl: ModalController,
     private pickerController: PickerController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private recordService: RecordService,
+    private gestureCtrl: GestureController
   ) { }
+
+  ngAfterViewInit(): void {
+    const longpress = this.gestureCtrl.create({
+      el: this.recordbtn.nativeElement,
+      threshold: 0,
+      gestureName: 'long-press',
+      onStart: ev => {
+        Haptics.impact({ style: ImpactStyle.Light });
+        this.startRecording();
+      },
+      onEnd: ev => {
+        Haptics.impact({ style: ImpactStyle.Light });
+        this.stopRecording();
+      }
+    }, true);
+    longpress.enable();
+  }
 
   ngOnInit() {
     this.messages = this.chatService.getChatMessages(this.messageLength);
@@ -53,6 +81,7 @@ export class ChatPage implements OnInit {
     this.scrollToBottom(1000);
     this.resetBadgeCount();
     this.checkUserToChat();
+    VoiceRecorder.requestAudioRecordingPermission();
   }
 
   sendMessage() {
@@ -258,6 +287,70 @@ export class ChatPage implements OnInit {
     this.replyMessageValue = value;
     this.replyMessageAuthor = author;
     this.replyMessageMsg = msg;
+  }
+
+  startRecording() {
+    if (this.recording) {
+      return;
+    }
+    this.recording = true;
+    VoiceRecorder.startRecording();
+    this.calculateDuration();
+  }
+  
+  stopRecording() {
+    if (!this.recording) {
+      return;
+    }
+    VoiceRecorder.stopRecording().then(async (recordResult: RecordingData) => {
+      this.recording = false;
+      if (recordResult.value && recordResult.value.recordDataBase64) {
+        console.log(recordResult.value.recordDataBase64);
+        //TODO: implement logic to save record data in firebase
+        if (recordResult) {
+          const fileName = new Date().getTime() + '.wav';
+          const loading = await this.loadingController.create();
+          await loading.present();
+    
+          const result = await this.recordService.uploadRecord(recordResult, fileName);
+          loading.dismiss();
+          this.scrollToBottom(500);
+    
+          if (!result) {
+            const alert = await this.alertController.create({
+              header: 'Upload failed',
+              message: 'there was a problem uploading your record.',
+              buttons: ['OK']
+            });
+            await alert.present();
+          }
+        }
+      }
+    });
+  }
+
+  playRecord(base64Record) {
+    this.isPlayRecord = true;
+    const audioRef = new Audio(`data:audio/aac;base64,${base64Record}`);
+    audioRef.oncanplaythrough = () => audioRef.play();
+    audioRef.play();
+  }
+
+  calculateDuration() {
+    if (!this.recording) {
+      this.duration = 0;
+      this.durationDisplay = '';
+      return;
+    }
+
+    this.duration += 1;
+    const minutes = Math.floor(this.duration / 60);
+    const seconds = (this.duration % 60).toString().padStart(2, '0');
+    this.durationDisplay = `${minutes}:${seconds}`;
+
+    setTimeout(() => {
+      this.calculateDuration();
+    }, 1000);
   }
 
 }

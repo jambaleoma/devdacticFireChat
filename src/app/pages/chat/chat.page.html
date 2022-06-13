@@ -51,6 +51,13 @@
             </div>
             <b>{{ message.fromName }}</b>
             <img *ngIf="message?.image" [src]="message.base64String" (click)="openPreview(message.base64String)" />
+            <div *ngIf="message?.record" (click)="playRecord(message.base64String)">
+              <ion-icon *ngIf="!isPlayRecord" slot="icon-only" name="play-outline"></ion-icon>
+              <span> Riproduci Audio </span>
+            </div>
+            <div *ngIf="message?.record" (click)="playRecord(message.base64String)">
+              <ion-icon *ngIf="isPlayRecord" slot="icon-only" name="volume-high-outline"></ion-icon>
+            </div>
             <div class="selectable">{{ message.msg }}</div>
             <div class="time ion-text-right">
               {{ message.createdAt?.toMillis() | date:'short' }}
@@ -82,7 +89,7 @@
   </ion-grid>
 </ion-content>
 
-<ion-fab horizontal="start" vertical="bottom" slot="fixed">
+<ion-fab horizontal="start" vertical="bottom" slot="fixed" *ngIf="!recording">
   <ion-fab-button color="light">
     <ion-icon md="caret-up" ios="chevron-up-circle-outline"></ion-icon>
   </ion-fab-button>
@@ -102,11 +109,14 @@
 <ion-footer>
   <ion-toolbar color="light">
     <ion-row class="ion-align-items-center">
-      <ion-col size="8" offset="2">
+      <ion-col size="8" *ngIf="recording">
+        <span> {{durationDisplay}} </span>
+      </ion-col>
+      <ion-col size="6" offset="2" *ngIf="!recording">
         <ion-textarea #newMsgInput autoGrow="true" class="message-input" rows="1" maxlength="500" [(ngModel)]="newMsg">
         </ion-textarea>
       </ion-col>
-      <ion-col size="2">
+      <ion-col size="2" *ngIf="!recording">
         <ion-button expand="block" fill="clear" color="primary" [disabled]="newMsg === ''" class="msg-btn"
           (click)="sendMessage()">
           <ion-icon name="send" slot="icon-only"></ion-icon>
@@ -115,3 +125,12 @@
     </ion-row>
   </ion-toolbar>
 </ion-footer>
+
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button #recordbtn *ngIf="!recording" color="tertiary">
+    <ion-icon name="mic-outline"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button *ngIf="recording" color="tertiary">
+    <ion-icon name="mic-off-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

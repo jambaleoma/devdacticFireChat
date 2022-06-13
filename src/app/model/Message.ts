@@ -9,6 +9,7 @@ export interface Message {
   myMsg?: boolean;
   base64String?: string;
   image?: boolean;
+  record?: boolean;
   reaction?: string;
   replyAuthor?: string;
   replyText?: string;
