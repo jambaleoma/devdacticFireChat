@@ -1,12 +1,27 @@
 import { InfoModalPage } from './../../info-modal/info-modal.page';
 import { ImageModalPage } from './../../image-modal/image-modal.page';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { RecordingData, VoiceRecorder } from 'capacitor-voice-recorder';
 import { PushNotifications } from '@capacitor/push-notifications';
-import { AlertController, GestureController, IonContent, IonTextarea, LoadingController, ModalController, PickerController, ToastController } from '@ionic/angular';
+import {
+  AlertController,
+  GestureController,
+  IonContent,
+  IonTextarea,
+  LoadingController,
+  ModalController,
+  PickerController,
+  ToastController,
+} from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { Message } from 'src/app/model/Message';
 import { User } from 'src/app/model/User';
@@ -24,6 +39,8 @@ import reactionButtons from './../../../assets/JSON/reactionsButtons.json';
 export class ChatPage implements OnInit, AfterViewInit {
   @ViewChild(IonContent) content: IonContent;
   @ViewChild('newMsgInput') newMsgInput: IonTextarea;
+  @ViewChild('messagesList') list;
+  @ViewChild('recordbtn', { read: ElementRef }) recordbtn: ElementRef;
 
   public messages: Observable<Message[]>;
   public newMsg = '';
@@ -37,13 +54,8 @@ export class ChatPage implements OnInit, AfterViewInit {
   public replyMessageMsg = '';
   public reactionButtons = reactionButtons.reactionButtons;
   public recording = false;
-  public isPlayRecord = false;
-  public durationDisplay= '';
+  public durationDisplay = '';
   public duration = 0;
-
-  @ViewChild('messagesList') list;
-  @ViewChild('recordbtn', {read: ElementRef}) recordbtn: ElementRef;
-  
 
   constructor(
     private chatService: ChatService,
@@ -56,22 +68,25 @@ export class ChatPage implements OnInit, AfterViewInit {
     private toastController: ToastController,
     private recordService: RecordService,
     private gestureCtrl: GestureController
-  ) { }
+  ) {}
 
   ngAfterViewInit(): void {
-    const longpress = this.gestureCtrl.create({
-      el: this.recordbtn.nativeElement,
-      threshold: 0,
-      gestureName: 'long-press',
-      onStart: ev => {
-        Haptics.impact({ style: ImpactStyle.Light });
-        this.startRecording();
+    const longpress = this.gestureCtrl.create(
+      {
+        el: this.recordbtn.nativeElement,
+        threshold: 0,
+        gestureName: 'long-press',
+        onStart: (ev) => {
+          Haptics.impact({ style: ImpactStyle.Light });
+          this.startRecording();
+        },
+        onEnd: (ev) => {
+          Haptics.impact({ style: ImpactStyle.Light });
+          this.stopRecording();
+        },
       },
-      onEnd: ev => {
-        Haptics.impact({ style: ImpactStyle.Light });
-        this.stopRecording();
-      }
-    }, true);
+      true
+    );
     longpress.enable();
   }
 
@@ -86,11 +101,17 @@ export class ChatPage implements OnInit, AfterViewInit {
 
   sendMessage() {
     if (this.replyMessageValue) {
-      this.chatService.addChatMessageReply(this.newMsg, this.replyMessageAuthor, this.replyMessageMsg).then(() => {
-        this.newMsg = '';
-        this.scrollToBottom(1000);
-        this.toastController.dismiss();
-      });
+      this.chatService
+        .addChatMessageReply(
+          this.newMsg,
+          this.replyMessageAuthor,
+          this.replyMessageMsg
+        )
+        .then(() => {
+          this.newMsg = '';
+          this.scrollToBottom(1000);
+          this.toastController.dismiss();
+        });
     } else {
       this.chatService.addChatMessage(this.newMsg).then(() => {
         this.newMsg = '';
@@ -118,7 +139,10 @@ export class ChatPage implements OnInit, AfterViewInit {
         duration: 1000,
       });
       await loading.present();
-      this.messages = await this.chatService.getChatMessages(this.messageLength + this.previousMessageToAdd, false);
+      this.messages = await this.chatService.getChatMessages(
+        this.messageLength + this.previousMessageToAdd,
+        false
+      );
       this.scrollToTop(1);
       this.messageLength = this.messageLength + this.previousMessageToAdd;
       event.target.complete();
@@ -130,7 +154,7 @@ export class ChatPage implements OnInit, AfterViewInit {
       quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Base64,
-      source: CameraSource.Camera
+      source: CameraSource.Camera,
     });
 
     if (photo) {
@@ -146,7 +170,7 @@ export class ChatPage implements OnInit, AfterViewInit {
         const alert = await this.alertController.create({
           header: 'Upload failed',
           message: 'there was a problem uploading your photo.',
-          buttons: ['OK']
+          buttons: ['OK'],
         });
         await alert.present();
       }
@@ -158,7 +182,7 @@ export class ChatPage implements OnInit, AfterViewInit {
       quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Base64,
-      source: CameraSource.Photos
+      source: CameraSource.Photos,
     });
 
     if (image) {
@@ -174,7 +198,7 @@ export class ChatPage implements OnInit, AfterViewInit {
         const alert = await this.alertController.create({
           header: 'Upload failed',
           message: 'there was a problem uploading your image.',
-          buttons: ['OK']
+          buttons: ['OK'],
         });
         await alert.present();
       }
@@ -184,7 +208,7 @@ export class ChatPage implements OnInit, AfterViewInit {
   async emailNotification() {
     const modal = await this.modalCtrl.create({
       component: InfoModalPage,
-      cssClass: 'transparent-modal'
+      cssClass: 'transparent-modal',
     });
     modal.present();
   }
@@ -215,7 +239,9 @@ export class ChatPage implements OnInit, AfterViewInit {
 
   checkUserToChat() {
     this.chatService.getUsers().subscribe((res) => {
-      this.userToChat = res.find((val) => val?.email !== this.chatService.currentUser?.email);
+      this.userToChat = res.find(
+        (val) => val?.email !== this.chatService.currentUser?.email
+      );
     });
   }
 
@@ -223,9 +249,9 @@ export class ChatPage implements OnInit, AfterViewInit {
     const modal = await this.modalCtrl.create({
       component: ImageModalPage,
       componentProps: {
-        base64String
+        base64String,
       },
-      cssClass: 'transparent-modal'
+      cssClass: 'transparent-modal',
     });
     modal.present();
   }
@@ -238,22 +264,25 @@ export class ChatPage implements OnInit, AfterViewInit {
           handler: () => {
             this.chatService.updateMessageReaction(messageToReply.id, null);
             this.list.closeSlidingItems();
-          }
+          },
         },
         {
           text: 'Conferma',
           handler: (selected) => {
-            this.chatService.updateMessageReaction(messageToReply.id, selected.reaction.value);
+            this.chatService.updateMessageReaction(
+              messageToReply.id,
+              selected.reaction.value
+            );
             this.list.closeSlidingItems();
-          }
-        }
+          },
+        },
       ],
       columns: [
         {
           name: 'reaction',
-          options: reactionButtons?.reactionButtons
-        }
-      ]
+          options: reactionButtons?.reactionButtons,
+        },
+      ],
     });
     await picker.present();
   }
@@ -263,7 +292,7 @@ export class ChatPage implements OnInit, AfterViewInit {
     const toast = await this.toastController.create({
       header: messageToReply.fromName,
       message: messageToReply.msg,
-      icon: 'arrow-undo-outline',      
+      icon: 'arrow-undo-outline',
       position: 'top',
       buttons: [
         {
@@ -271,9 +300,9 @@ export class ChatPage implements OnInit, AfterViewInit {
           role: 'cancel',
           handler: () => {
             console.log('Cancel clicked');
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     this.list.closeSlidingItems();
     this.newMsgInput.setFocus();
@@ -297,7 +326,7 @@ export class ChatPage implements OnInit, AfterViewInit {
     VoiceRecorder.startRecording();
     this.calculateDuration();
   }
-  
+
   stopRecording() {
     if (!this.recording) {
       return;
@@ -311,16 +340,19 @@ export class ChatPage implements OnInit, AfterViewInit {
           const fileName = new Date().getTime() + '.wav';
           const loading = await this.loadingController.create();
           await loading.present();
-    
-          const result = await this.recordService.uploadRecord(recordResult, fileName);
+
+          const result = await this.recordService.uploadRecord(
+            recordResult,
+            fileName
+          );
           loading.dismiss();
           this.scrollToBottom(500);
-    
+
           if (!result) {
             const alert = await this.alertController.create({
               header: 'Upload failed',
               message: 'there was a problem uploading your record.',
-              buttons: ['OK']
+              buttons: ['OK'],
             });
             await alert.present();
           }
@@ -329,11 +361,21 @@ export class ChatPage implements OnInit, AfterViewInit {
     });
   }
 
-  playRecord(base64Record) {
-    this.isPlayRecord = true;
+  async playRecord(base64Record) {
     const audioRef = new Audio(`data:audio/aac;base64,${base64Record}`);
     audioRef.oncanplaythrough = () => audioRef.play();
     audioRef.play();
+    const alert = await this.alertController.create({
+      header: 'Messaggio audio',
+      message: `<img src="./../../../assets/image/gif/sound.gif" alt="sound">`,
+    });
+    await alert.present();
+    alert.onDidDismiss().then(() => {
+      audioRef.pause();
+    });
+    audioRef.onended = () => {
+      alert.dismiss();
+    };
   }
 
   calculateDuration() {
@@ -352,5 +394,4 @@ export class ChatPage implements OnInit, AfterViewInit {
       this.calculateDuration();
     }, 1000);
   }
-
 }
