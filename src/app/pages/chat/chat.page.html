@@ -52,11 +52,8 @@
             <b>{{ message.fromName }}</b>
             <img *ngIf="message?.image" [src]="message.base64String" (click)="openPreview(message.base64String)" />
             <div *ngIf="message?.record" (click)="playRecord(message.base64String)">
-              <ion-icon *ngIf="!isPlayRecord" slot="icon-only" name="play-outline"></ion-icon>
+              <ion-icon slot="icon-only" name="play-outline"></ion-icon>
               <span> Riproduci Audio </span>
-            </div>
-            <div *ngIf="message?.record" (click)="playRecord(message.base64String)">
-              <ion-icon *ngIf="isPlayRecord" slot="icon-only" name="volume-high-outline"></ion-icon>
             </div>
             <div class="selectable">{{ message.msg }}</div>
             <div class="time ion-text-right">
