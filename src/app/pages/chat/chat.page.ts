@@ -42,7 +42,7 @@ export class ChatPage implements OnInit, AfterViewInit {
   @ViewChild('messagesList') list;
   @ViewChild('recordbtn', { read: ElementRef }) recordbtn: ElementRef;
 
-  public messages: Observable<Message[]>;
+  public messages$: Observable<Message[]>;
   public newMsg = '';
   public userToChat: User = null;
   public isOnline = false;
@@ -73,7 +73,7 @@ export class ChatPage implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const longpress = this.gestureCtrl.create(
       {
-        el: this.recordbtn.nativeElement,
+        el: this.recordbtn?.nativeElement,
         threshold: 0,
         gestureName: 'long-press',
         onStart: (ev) => {
@@ -91,10 +91,11 @@ export class ChatPage implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.messages = this.chatService.getChatMessages(this.messageLength);
+    this.messages$ = this.chatService.getChatMessages(this.messageLength);
     this.checkNewMessage();
     this.scrollToBottom(1000);
-    this.resetBadgeCount();
+    //#TODO: Uncomment once push notification service is implemented
+    // this.resetBadgeCount();
     this.checkUserToChat();
     VoiceRecorder.requestAudioRecordingPermission();
   }
@@ -139,13 +140,12 @@ export class ChatPage implements OnInit, AfterViewInit {
         duration: 1000,
       });
       await loading.present();
-      this.messages = await this.chatService.getChatMessages(
+      this.messages$ = await this.chatService.getChatMessages(
         this.messageLength + this.previousMessageToAdd,
         false
       );
       this.scrollToTop(1);
       this.messageLength = this.messageLength + this.previousMessageToAdd;
-      event.target.complete();
     }
   }
 
