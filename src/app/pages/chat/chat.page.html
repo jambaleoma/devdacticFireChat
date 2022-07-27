@@ -123,10 +123,10 @@
   <ion-fab-button *ngIf="!recording && newMsg" color="tertiary" (click)="sendMessage()" [disabled]="newMsg === ''">
     <ion-icon name="send"></ion-icon>
   </ion-fab-button>
-  <ion-fab-button #recordbtn *ngIf="!recording && !newMsg" color="tertiary">
+  <ion-fab-button *ngIf="!recording && !newMsg" color="tertiary" (click)="startRecording()">
     <ion-icon name="mic-outline"></ion-icon>
   </ion-fab-button>
-  <ion-fab-button *ngIf="recording && !newMsg" color="tertiary">
+  <ion-fab-button *ngIf="recording && !newMsg" color="tertiary" (click)="stopRecording()">
     <ion-icon name="mic-off-outline"></ion-icon>
   </ion-fab-button>
 </ion-fab>

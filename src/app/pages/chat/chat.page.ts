@@ -1,15 +1,8 @@
 import { InfoModalPage } from './../../info-modal/info-modal.page';
 import { ImageModalPage } from './../../image-modal/image-modal.page';
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { RecordingData, VoiceRecorder } from 'capacitor-voice-recorder';
 import { PushNotifications } from '@capacitor/push-notifications';
 import {
@@ -36,11 +29,10 @@ import reactionButtons from './../../../assets/JSON/reactionsButtons.json';
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
 })
-export class ChatPage implements OnInit, AfterViewInit {
+export class ChatPage implements OnInit {
   @ViewChild(IonContent) content: IonContent;
   @ViewChild('newMsgInput') newMsgInput: IonTextarea;
   @ViewChild('messagesList') list;
-  @ViewChild('recordbtn', { read: ElementRef }) recordbtn: ElementRef;
 
   public messages$: Observable<Message[]>;
   public newMsg = '';
@@ -66,29 +58,8 @@ export class ChatPage implements OnInit, AfterViewInit {
     private modalCtrl: ModalController,
     private pickerController: PickerController,
     private toastController: ToastController,
-    private recordService: RecordService,
-    private gestureCtrl: GestureController
+    private recordService: RecordService
   ) {}
-
-  ngAfterViewInit(): void {
-    const longpress = this.gestureCtrl.create(
-      {
-        el: this.recordbtn?.nativeElement,
-        threshold: 0,
-        gestureName: 'long-press',
-        onStart: (ev) => {
-          Haptics.impact({ style: ImpactStyle.Light });
-          this.startRecording();
-        },
-        onEnd: (ev) => {
-          Haptics.impact({ style: ImpactStyle.Light });
-          this.stopRecording();
-        },
-      },
-      true
-    );
-    longpress.enable();
-  }
 
   ngOnInit() {
     this.messages$ = this.chatService.getChatMessages(this.messageLength);
@@ -298,9 +269,7 @@ export class ChatPage implements OnInit, AfterViewInit {
         {
           icon: 'close-circle-outline',
           role: 'cancel',
-          handler: () => {
-            console.log('Cancel clicked');
-          },
+          handler: () => {},
         },
       ],
     });
@@ -334,7 +303,6 @@ export class ChatPage implements OnInit, AfterViewInit {
     VoiceRecorder.stopRecording().then(async (recordResult: RecordingData) => {
       this.recording = false;
       if (recordResult.value && recordResult.value.recordDataBase64) {
-        console.log(recordResult.value.recordDataBase64);
         //TODO: implement logic to save record data in firebase
         if (recordResult) {
           const fileName = new Date().getTime() + '.wav';
