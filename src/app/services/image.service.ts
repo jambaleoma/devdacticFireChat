@@ -28,7 +28,7 @@ export class ImageService {
   async getImagesListSend() {
     this.imagesListUrl = [];
     const user = this.auth.currentUser;
-    const path = `uploads/${user?.uid}`;
+    const path = `uploads/images/${user?.uid}`;
     const storageRef = ref(this.storage, path);
 
     try {
@@ -47,7 +47,7 @@ export class ImageService {
   async getImagesListReceived(userToChat) {
     this.imagesListUrl = [];
     const user = this.auth.currentUser;
-    const path = `uploads/${userToChat?.uid}`;
+    const path = `uploads/images/${userToChat?.uid}`;
     const storageRef = ref(this.storage, path);
 
     try {
@@ -65,7 +65,7 @@ export class ImageService {
 
   async uploadImage(cameraFile: Photo, fileName: string) {
     const user = this.auth.currentUser;
-    const path = `uploads/${user.uid}/${fileName}`;
+    const path = `uploads/images/${user.uid}/${fileName}`;
     const storageRef = ref(this.storage, path);
 
     try {

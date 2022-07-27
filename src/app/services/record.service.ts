@@ -27,7 +27,7 @@ export class RecordService {
 
   async uploadRecord(data: RecordingData, fileName: string) {
     const user = this.auth.currentUser;
-    const path = `uploads/${user.uid}/${fileName}`;
+    const path = `uploads/records/${user.uid}/${fileName}`;
     const storageRef = ref(this.storage, path);
 
     try {

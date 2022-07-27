@@ -66,7 +66,7 @@ export class MySettingsPage implements OnInit {
 
   async changeAvatar() {
     const image = await Camera.getPhoto({
-      quality: 90,
+      quality: 50,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Prompt,
