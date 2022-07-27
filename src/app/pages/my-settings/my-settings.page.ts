@@ -1,9 +1,10 @@
 import { ChangeModalPage } from './../../change-modal/change-modal.page';
-import { ModalController } from '@ionic/angular';
+import { ModalController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ChatService } from './../../services/chat.service';
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/model/User';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-my-settings',
@@ -17,7 +18,8 @@ export class MySettingsPage implements OnInit {
   constructor(
     private chatService: ChatService,
     private router: Router,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private loadingController: LoadingController
   ) { }
 
   ngOnInit() {
@@ -60,6 +62,22 @@ export class MySettingsPage implements OnInit {
       }
     });
     modal.present();
+  }
+
+  async changeAvatar() {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Prompt,
+    });
+
+    if (image) {
+      const loading = await this.loadingController.create();
+      await loading.present();
+      await this.chatService.updateUserData('avatar', 'data:image/' + image.format + ';base64,' + image.base64String);
+      loading.dismiss();
+    }
   }
 
 }

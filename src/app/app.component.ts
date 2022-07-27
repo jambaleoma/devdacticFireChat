@@ -10,7 +10,8 @@ import { FcmService } from './services/fcm.service';
 export class AppComponent {
   constructor(
     private platform: Platform,
-    private fcmService: FcmService
+    //#TODO: Uncomment once push notification service is implemented
+    // private fcmService: FcmService
   ) {
     this.initializeApp();
   }
@@ -18,7 +19,8 @@ export class AppComponent {
   initializeApp() {
     this.platform.ready().then(() => {
       // Trigger the push setup
-      this.fcmService.initPush();
+      //#TODO: Uncomment once push notification service is implemented
+      // this.fcmService.initPush();
     });
   }
 }

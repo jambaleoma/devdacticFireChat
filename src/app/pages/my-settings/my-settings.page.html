@@ -12,7 +12,7 @@
 <ion-content>
 
   <ion-card class="cardAlignCenter cardMarignTopBottom">
-    <ion-avatar class="cardAvatar">
+    <ion-avatar class="cardAvatar" (click)="changeAvatar()">
       <img [src]="user?.avatar" />
     </ion-avatar>
     <ion-card-header>
